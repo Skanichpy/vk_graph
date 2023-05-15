@@ -1,0 +1,15 @@
+{
+	"model_name": "KNeighborsClassifier",
+	"datetime": "2023-05-16 01:39:34.872182",
+	"params": {
+		"algorithm": "auto",
+		"leaf_size": 30,
+		"metric": "minkowski",
+		"metric_params": null,
+		"n_jobs": null,
+		"n_neighbors": 10,
+		"p": 2,
+		"weights": "uniform"
+	},
+	"features": "all"
+}
