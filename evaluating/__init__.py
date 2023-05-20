@@ -80,8 +80,9 @@ class Evaluator:
         with open(f'{dir_load}/{self.model_name}/{self.model_name}.pkl', 'wb') as fp: 
             pickle.dump(self.model, fp)
     
-    def write_submitions(self, X_train, X_test,
-                        dir_load: str, **kwargs) -> None:
+    def write_submitions(self, X_train, X_test, y_train, 
+                         y_test, dir_load: str, 
+                        **kwargs) -> None:
         """save submition and model info"""
         if f'{self.model_name}' not in os.listdir(dir_load):
             os.mkdir(f'{dir_load}/{self.model_name}')
@@ -95,8 +96,16 @@ class Evaluator:
             json.dump(info_dict, fp, indent='\t')
 
         train_proba_df, test_proba_df = self.make_submition(X_train, X_test)
+
+        train_proba_df= train_proba_df.merge(y_train, left_index=True, 
+                                             right_index=True, how='left')
+        test_proba_df = test_proba_df.merge(y_test, left_index=True,
+                                            right_index=True, how='left')
+
         train_proba_df.to_csv(f'{dir_load}/{self.model_name}/train_submition.csv')
         test_proba_df.to_csv(f'{dir_load}/{self.model_name}/test_submition.csv')
+
+        
 
  
     def write_metrics(self, X_train, y_train,  
@@ -119,7 +128,8 @@ class Evaluator:
         """run all write methods"""
         self.write_model(dir_load)
         print('Model saved...') if log else None
-        self.write_submitions(X_train, X_test, dir_load, **kwargs)
+        self.write_submitions(X_train, X_test, y_train, y_test,
+                               dir_load, **kwargs)
         print('Submitions saved...') if log else None
         self.write_metrics(X_train, y_train, X_test, y_test, 
                            metric_func_set, dir_load)
