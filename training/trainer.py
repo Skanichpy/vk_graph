@@ -107,8 +107,8 @@ def backward_selection_regression(argList, model, x_train, y_train, x_test, y_te
     backward_argList = argList.copy()
     
     model.fit(x_train[backward_argList], y_train)
-    probs_train = model.predict(x_test[backward_argList])
-    metric = mean_squared_error(y_test, probs_test)
+    probs_test = model.predict(x_test[backward_argList])
+    metric = mean_squared_error(y_test, probs_test, squared = False)
     print('RMSE Test initial = ', metric)
     
     if n_features_to_select == -1:
@@ -118,7 +118,7 @@ def backward_selection_regression(argList, model, x_train, y_train, x_test, y_te
             for i in backward_argList:
                 model.fit(x_train[backward_argList].drop(i, axis = 1), y_train)
                 probs_test = model.predict(x_test[backward_argList].drop(i, axis = 1))
-                metric_new = mean_squared_error(y_test, probs_test)
+                metric_new = mean_squared_error(y_test, probs_test, squared = False)
                 
                 if (metric_new/metric <= 1 + quality_loss/100):
                     if metric_new/metric < best_metric_dif:
@@ -138,7 +138,7 @@ def backward_selection_regression(argList, model, x_train, y_train, x_test, y_te
             for i in backward_argList:
                 model.fit(x_train[backward_argList].drop(i, axis = 1), y_train)
                 probs_test = model.predict(x_test[backward_argList].drop(i, axis = 1))[:, 1]
-                metric_new = mean_squared_error(y_test, probs_test)
+                metric_new = mean_squared_error(y_test, probs_test, squared = False)
                 
                 if metric_new < best_metric:
                     best_metric = metric_new
@@ -246,17 +246,17 @@ def objective(trial, model_type, x_train, y_train, type = 'reg'):
         if model_type == 'LGBM':
             model = lgb.LGBMRegressor()
             param = {
-                "objective": "binary",
-                "metric": "binary_logloss",
-                "verbosity": -1,
+                "objective": "regression",
+                # "metric": "binary_logloss",
+                "verbosity": 0,
                 "boosting_type": "gbdt",
-                "lambda_l1": trial.suggest_float("lambda_l1", 1e-8, 10.0, log=True),
-                "lambda_l2": trial.suggest_float("lambda_l2", 1e-8, 10.0, log=True),
-                "num_leaves": trial.suggest_int("num_leaves", 2, 256),
-                "feature_fraction": trial.suggest_float("feature_fraction", 0.4, 1.0),
-                "bagging_fraction": trial.suggest_float("bagging_fraction", 0.4, 1.0),
-                "bagging_freq": trial.suggest_int("bagging_freq", 1, 7),
-                "min_child_samples": trial.suggest_int("min_child_samples", 5, 100),
+                "max_depth": trial.suggest_int("max_depth", 1, 10),
+                "num_leaves": trial.suggest_int("num_leaves", 10, 100),
+                "n_estimators": trial.suggest_int("n_estimators", 50, 200),
+                "reg_alpha": trial.suggest_float("reg_alpha", 1e-8, 10.0, log=True),
+                "reg_lambda": trial.suggest_float("reg_lambda", 1e-8, 10.0, log=True),
+                "min_child_samples": trial.suggest_int("min_child_samples", 5, 70),
+                "min_child_weight": trial.suggest_float("min_child_weight", 1e-8, 10.0),
             }
         model.set_params(**param)
         model.fit(x_train, y_train)
@@ -281,9 +281,9 @@ def objective(trial, model_type, x_train, y_train, type = 'reg'):
         model.fit(x_train, y_train)
         return roc_auc_score(y_train, model.predict_proba(x_train)[:, 1])
 
-def calc_hps(model, x_train, y_train, type = 'reg'):
+def calc_hps(model, x_train, y_train, type = 'reg', trials_num = 100):
     study = optuna.create_study(direction='maximize')
-    study.optimize(lambda trial: objective(trial, model, x_train, y_train, type = type), n_trials=100)
+    study.optimize(lambda trial: objective(trial, model, x_train, y_train, type = type), n_trials=trials_num)
     return study.best_params
 
         
