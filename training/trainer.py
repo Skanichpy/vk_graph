@@ -52,7 +52,7 @@ def objective(trial, model_type, x_train, y_train, type = 'reg'):
             param = {
                 "objective": "regression",
                 # "metric": "binary_logloss",
-                "verbosity": 0,
+                "verbosity": -1,
                 "boosting_type": "gbdt",
                 "max_depth": trial.suggest_int("max_depth", 1, 10),
                 "num_leaves": trial.suggest_int("num_leaves", 10, 100),
@@ -64,7 +64,7 @@ def objective(trial, model_type, x_train, y_train, type = 'reg'):
             }
         model.set_params(**param)
         model.fit(x_train, y_train)
-        return -mean_squared_error(y_train, model.predict(x_train), squared = False)
+        return -mean_squared_error(y_test, model.predict(x_test), squared = False)
     else:
         if model_type == 'LGBM':
             model = lgb.LGBMClassifier()
