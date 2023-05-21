@@ -27,3 +27,8 @@
 ```
 ### <u>Запуск</u>:
 Последовательный запуск .ipynb Stage1->...Stage4!
+
+<!-- ![App Screenshot](https://via.placeholder.com/468x300?text=App+Screenshot+Here) -->
+<br>
+
+[![presentation](https://img.shields.io/badge/Microsoft_PowerPoint-B7472A?style=for-the-badge&logo=microsoft-powerpoint&logoColor=white&label=%D0%9F%D1%80%D0%B5%D0%B7%D0%B5%D0%BD%D1%82%D0%B0%D1%86%D0%B8%D1%8F)](https://disk.yandex.ru/i/BBSeICT6dVIuLg)
