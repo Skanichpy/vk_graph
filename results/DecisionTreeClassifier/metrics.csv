@@ -1,4 +1,0 @@
-metric,train_score,test_score
-accuracy_score,1.0,0.7166666666666667
-roc_auc_score,1.0,0.7114285714285714
-f1_score,1.0,0.7536231884057971
