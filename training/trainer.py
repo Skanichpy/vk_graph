@@ -45,7 +45,7 @@ def get_top_features(model, argList, x_train, y_train, x_test, y_test, type='reg
     return top_n_features, argList[:top_n_features]
 
     
-def objective(trial, model_type, x_train, y_train, type = 'reg'):
+def objective(trial, model_type, x_train, y_train, x_test, y_test, type = 'reg'):
     if type == 'reg':
         if model_type == 'LGBM':
             model = lgb.LGBMRegressor()
@@ -85,7 +85,7 @@ def objective(trial, model_type, x_train, y_train, type = 'reg'):
         model.fit(x_train, y_train)
         return roc_auc_score(y_train, model.predict_proba(x_train)[:, 1])
 
-def calc_hps(model, x_train, y_train, type = 'reg', trials_num = 100):
+def calc_hps(model, x_train, y_train, x_test, y_test, type = 'reg', trials_num = 100):
     study = optuna.create_study(direction='maximize')
-    study.optimize(lambda trial: objective(trial, model, x_train, y_train, type = type), n_trials=trials_num)
+    study.optimize(lambda trial: objective(trial, model, x_train, y_train, x_test, y_test, type = type), n_trials=trials_num)
     return study.best_params
